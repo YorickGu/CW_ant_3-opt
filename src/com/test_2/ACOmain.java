@@ -20,7 +20,7 @@ public class ACOmain {
 
 		int N = locate.length; // 城市数目
 		// int M=locate.length;
-		int M = 60;
+		int M = (int)(N*0.666667); 
 		int L = 500;
 		double value;   // 信息素的初值设定
 		double beta = 5;

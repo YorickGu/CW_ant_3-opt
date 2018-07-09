@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import javax.swing.JPanel;
 
 public class ACOtest extends JPanel {
-	final static double k = 0.9;
+	final static double k = 10;
 	final static int m = 20;
 	int[][] result = new int[init.N - 1][2];
 	double globalBestLength;

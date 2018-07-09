@@ -10,7 +10,7 @@ public class main_func extends JFrame {
 	
 	Pattern_Display pd = null;
 	ACOtest at = null;
-	static double[][] min_locate = new double[init.N][2];
+	static double[][] min_locate = new double[init.N][2]; 
 	static int[] min_route = new int[init.N+20];
 	static double min_dis =Integer.MAX_VALUE;
 	public  ArrayList<Double> array = new ArrayList<Double>();
@@ -20,7 +20,7 @@ public class main_func extends JFrame {
 	public void main_init() {
 //		double rounum=0;
 		
-		for(int i =1;i<init.N;i=i+6) {
+		for(int i =1;i<init.N;i=i+5) {
 			CWTSP cwtsp = new CWTSP();
 			cwtsp.CWTSP_init(i);   	//CW½ÚÔ¼Ëã·¨
 			

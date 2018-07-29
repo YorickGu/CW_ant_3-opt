@@ -20,7 +20,8 @@ public class main_func extends JFrame {
 	public void main_init() {
 //		double rounum=0;
 		
-		for(int i =1;i<init.N;i=i+5) {
+		for(int i =1;i<init.N;i=i+1) {
+//		int i=1;
 			CWTSP cwtsp = new CWTSP();
 			cwtsp.CWTSP_init(i);   	//CW½ÚÔ¼Ëã·¨
 			
@@ -124,7 +125,5 @@ public class main_func extends JFrame {
 		
 
 	}
-	
-	
 
 }

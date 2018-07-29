@@ -3,6 +3,7 @@ package com.test_2;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
+import java.text.DecimalFormat;
 import java.util.Random;
 
 import static java.lang.Math.random;
@@ -22,6 +23,7 @@ public class ACO {
 	double K;
 	double templength;
 	static int numlength = 0;
+	static int numlength_sum = 0;
 	double aveinfo;
 
 	private double alpha; // 期望启发式因子，表示蚂蚁运动对信息素影响的程度
@@ -123,7 +125,7 @@ public class ACO {
 	}
 
 	// 一只蚂蚁搜索路径并完一周旅行的函数
-	Ant SearchGo(Ant ant) {
+	Ant SearchGo(Ant ant, int num) {
 
 		int nextCity;
 		int endCity;
@@ -140,7 +142,7 @@ public class ACO {
 
 			ant.visitednum++;
 			endCity = ant.currentCity;
-			nextCity = Choose(ant);
+			nextCity = Choose(ant, num);
 			if (nextCity >= 0) {
 				ant.visited[nextCity] = 0;
 				ant.tour[ant.visitednum - 1][0] = ant.currentCity;
@@ -165,11 +167,13 @@ public class ACO {
 	}
 
 	// 选择下一个城市
-	int Choose(Ant ant) {
+	int Choose(Ant ant, int num) {
 		int nextCity = -1;
+		// double e = Math.E;
+		// double Pro = 1-0.99*(1-pow(e,(-num/(0.05*L))));
 		double q = random();
 		// 测试可知，q 小于0.01的几率很小，既是为了满足蚁群算法中的小概率出错事件，为了满足蚁群创新性
-		if (q < 0.05) {
+		if (q < 0.01) {
 			double pros = -1.0;
 			for (int i = 0; i < N; i++) {
 				if (ant.visited[i] == 1) {
@@ -216,7 +220,7 @@ public class ACO {
 	/*-------------------------------第三部分，全局计算，找出一次循环结束后的最优路径和最小长度，并进行信息素的全局更新---------------------------*/
 
 	// 蚁群在一次循环过程中的最优路径并进行信息素的更新
-	public Ant OneIterator() {
+	public Ant OneIterator(int num) {
 
 		int[] nums = new int[N];
 		for (int i = 0; i < N; i++) {
@@ -234,7 +238,7 @@ public class ACO {
 			ant[i].startCity = nums[i];
 
 			// System.out.println("ant"+i+"startCity"+ant[i].startCity);
-			ant[i] = SearchGo(ant[i]);
+			ant[i] = SearchGo(ant[i], num);
 		}
 
 		// 选择出当前循环中的最好的路径
@@ -259,54 +263,95 @@ public class ACO {
 		}
 
 		// 进行opt-3转换
-		int Number = 10;
+		// System.out.println();
+//		 int Number = 10;
+//		 int x,y;
+		// double[] number = new double[2];
 		for (int i = 0; i < N; i++) {
-			for (int j = i + 2; j < N + Number; j++) {
-				for (int k = j + 2; k < (N + (Number * 2)); k++) {
-					if ((k - i + 1) <= Number) {
-						int number = switch_mindistance(bestAnt, i, j, k);
-						// for(int x=0;x<N;x++) {
-						// bestAnt.tour[x] = switch_mindistance(bestAnt,i,j,k).tour[x].clone();
-						// }
+			for (int j = i + 2; j < (N); j++) {
 
-						switch (number) {
-						case 0:
-							break;
-						case 1:
-							rever(bestAnt, i + 1, j);
-							break;
-						case 2:
-							rever(bestAnt, j + 1, k);
-							break;
-						case 3:
-							rever(bestAnt, i, k + 1);
-							break;
-						case 4:
-							rever(bestAnt, j + 1, k);
-							rever(bestAnt, i, k + 1);
-							break;
-						case 5:
-							rever(bestAnt, i, k + 1);
-							rever(bestAnt, i + 1, j);
-							break;
-						case 6:
-							rever(bestAnt, i + 1, j);
-							rever(bestAnt, j + 1, k);
-							break;
-						case 7:
-							rever(bestAnt, i + 1, j);
-							rever(bestAnt, j + 1, k);
-							rever(bestAnt, i, k + 1);
-							break;
-						default:
-							break;
+//				 if ((j - i - 1) <= Number) {
+//				if (j >= N) {
+//					x = j - N;
+//				}
+//				else {
+//					x = j;
+//				}
+				if (distance[bestAnt.tour[i][0]][bestAnt.tour[j][0]] < (bestAnt.totalLength / 2)) {
 
+					for (int k = j + 2; k < (N); k++) {
+						// if ((k - j - 1) <= Number) {
+//						if (k >= N) {
+//							y = k - N;
+//						}
+//						else {
+//							y = k;
+//						}
+						if (distance[bestAnt.tour[j][0]][bestAnt.tour[k][0]] < (bestAnt.totalLength / 2)) {
+
+							int number = switch_mindistance(bestAnt, i, j, k);
+
+							// DecimalFormat df2 = new DecimalFormat("000.000");
+							// System.out.print(df2.format(number[1])+" "+(int)number[0]+" ");
+							// System.out.print(number);
+							// for(int x=0;x<N;x++) {
+							// bestAnt.tour[x] = switch_mindistance(bestAnt,i,j,k).tour[x].clone();
+							// }
+
+							switch (number) {
+							case 0:
+								break;
+							case 1:
+								rever(bestAnt, i + 1, j);
+								// bestAnt.totalLength = bestAnt.totalLength - number[1];
+								break;
+							case 2:
+								rever(bestAnt, j + 1, k);
+								// bestAnt.totalLength = bestAnt.totalLength - number[1];
+								break;
+							case 3:
+								rever(bestAnt, k + 1, i);
+								// bestAnt.totalLength = bestAnt.totalLength - number[1];
+								break;
+							case 4:
+								rever(bestAnt, j + 1, k);
+								rever(bestAnt, k + 1, i);
+								// bestAnt.totalLength = bestAnt.totalLength - number[1];
+								break;
+							case 5:
+								rever(bestAnt, k + 1, i);
+								rever(bestAnt, i + 1, j);
+								// bestAnt.totalLength = bestAnt.totalLength - number[1];
+								break;
+							case 6:
+								rever(bestAnt, i + 1, j);
+								rever(bestAnt, j + 1, k);
+								// bestAnt.totalLength = bestAnt.totalLength - number[1];
+								break;
+							case 7:
+								rever(bestAnt, i + 1, j);
+								rever(bestAnt, j + 1, k);
+								rever(bestAnt, k + 1, i);
+								// bestAnt.totalLength = bestAnt.totalLength - number[1];
+								break;
+
+							}
+						} else {
+							break;
 						}
-					} else {
-						break;
 					}
+				} else {
+					break;
 				}
 			}
+			// System.out.println();
+		}
+		// System.out.println();
+		bestAnt.totalLength = 0;
+		for (int i = 0; i < N; i++) { // 每只蚂蚁所走的路径长度
+			a = bestAnt.tour[i][0]; // tour是蚂蚁行走的城市顺序
+			b = bestAnt.tour[i][1];
+			bestAnt.totalLength += distance[a][b];
 		}
 
 		// 进行全局信息素更新
@@ -314,7 +359,7 @@ public class ACO {
 		// K = (1 - kaifang) / ((N / 2 - 1) * kaifang);
 		kaifang = pow(globalBestLength, 1 / N);
 		K = (10 * (1 - kaifang)) / ((N - 2) * kaifang);
-		aveinfo = ((1 + K) * ((1 - globalRate) * globalBestLength)) / 2;
+		aveinfo = ((1 - globalRate) * globalBestLength) / 10;
 
 		templength = globalBestLength;
 
@@ -341,26 +386,31 @@ public class ACO {
 
 		}
 
-		if (Math.abs(templength - globalBestLength) < (0.05)) {
+		if (templength == globalBestLength) {
 			numlength++;
-			if (numlength > 30) {
-				beta = 0.75 * (Length) / globalBestLength;
-				// alpha = alpha*(globalBestLength/Length)*5;
+			numlength_sum++;
+			if (numlength > 10) {
+				beta = 1 * (Length) / globalBestLength;
+//				if (globalRate <= 0.3 && localRate <= 0.3) {
+//					globalRate = globalRate * 1.1;
+//					localRate = localRate * 1.1;
+//				}
+				// alpha = (globalBestLength/Length)*2;
 				numlength = 0;
-				// for(int i =0;i<N;i++) {
-				// for(int j =0;j<N;j++) {
-				// if(info[i][j]>aveinfo) {
-				// info[i][j] = 0.8*info[i][j];
-				// }
-				// else {
-				// info[i][j] = 2*info[i][j];
-				// }
-				// }
-				// }
-				// numlength = 0;
+			}
+			if (numlength_sum > 30) {
+				for (int i = 0; i < N; i++) {
+					for (int j = 0; j < N; j++) {
+						if (info[i][j] > aveinfo) {
+							info[i][j] = 0.4 * info[i][j];
+						}
+					}
+				}
+				numlength_sum = 0;
 			}
 		} else {
 			numlength = 0;
+			numlength_sum = 0;
 		}
 
 		return bestAnt;
@@ -418,45 +468,69 @@ public class ACO {
 			k = k - N;
 		}
 		int number = 0;
-		double number_8 = 999999;
+		double number_8 = 99999999;
 		double[] number_num = new double[8];
 
 		if ((i != N - 1) && (j != N - 1) && (k != N - 1)) {
-			number_num[0] = distance[i][i + 1] + distance[j][j + 1] + distance[k][k + 1];
-			number_num[1] = distance[i][j] + distance[i + 1][j + 1] + distance[k][k + 1];
-			number_num[2] = distance[i][i + 1] + distance[j][k] + distance[j + 1][k + 1];
-			number_num[3] = distance[i][k] + distance[j][j + 1] + distance[k + 1][i + 1];
-			number_num[4] = distance[i][j + 1] + distance[k][j] + distance[i + 1][k + 1];
-			number_num[5] = distance[i][k] + distance[i + 1][j + 1] + distance[j][k + 1];
-			number_num[6] = distance[i][j] + distance[i + 1][k] + distance[j + 1][k + 1];
-			number_num[7] = distance[i][j + 1] + distance[k][i + 1] + distance[j][k + 1];
+			int a = bestAnt.tour[i][0];
+			int a_1 = bestAnt.tour[i + 1][0];
+			int b = bestAnt.tour[j][0];
+			int b_1 = bestAnt.tour[j + 1][0];
+			int c = bestAnt.tour[k][0];
+			int c_1 = bestAnt.tour[k + 1][0];
+			number_num[0] = distance[a][a_1] + distance[b][b_1] + distance[c][c_1];
+			number_num[1] = distance[a][b] + distance[a_1][b_1] + distance[c][c_1];
+			number_num[2] = distance[a][a_1] + distance[b][c] + distance[b_1][c_1];
+			number_num[3] = distance[a][c] + distance[b][b_1] + distance[c_1][a_1];
+			number_num[4] = distance[a][b_1] + distance[c][b] + distance[a_1][c_1];
+			number_num[5] = distance[a][c] + distance[a_1][b_1] + distance[b][c_1];
+			number_num[6] = distance[a][b] + distance[a_1][c] + distance[b_1][c_1];
+			number_num[7] = distance[a][b_1] + distance[c][a_1] + distance[b][c_1];
 		} else if (i == N - 1) {
-			number_num[0] = distance[i][0] + distance[j][j + 1] + distance[k][k + 1];
-			number_num[1] = distance[i][j] + distance[0][j + 1] + distance[k][k + 1];
-			number_num[2] = distance[i][0] + distance[j][k] + distance[j + 1][k + 1];
-			number_num[3] = distance[i][k] + distance[j][j + 1] + distance[k + 1][0];
-			number_num[4] = distance[i][j + 1] + distance[k][j] + distance[0][k + 1];
-			number_num[5] = distance[i][k] + distance[0][j + 1] + distance[j][k + 1];
-			number_num[6] = distance[i][j] + distance[0][k] + distance[j + 1][k + 1];
-			number_num[7] = distance[i][j + 1] + distance[k][0] + distance[j][k + 1];
+			int a = bestAnt.tour[i][0];
+			int a_1 = bestAnt.tour[0][0];
+			int b = bestAnt.tour[j][0];
+			int b_1 = bestAnt.tour[j + 1][0];
+			int c = bestAnt.tour[k][0];
+			int c_1 = bestAnt.tour[k + 1][0];
+			number_num[0] = distance[a][a_1] + distance[b][b_1] + distance[c][c_1];
+			number_num[1] = distance[a][b] + distance[a_1][b_1] + distance[c][c_1];
+			number_num[2] = distance[a][a_1] + distance[b][c] + distance[b_1][c_1];
+			number_num[3] = distance[a][c] + distance[b][b_1] + distance[c_1][a_1];
+			number_num[4] = distance[a][b_1] + distance[c][b] + distance[a_1][c_1];
+			number_num[5] = distance[a][c] + distance[a_1][b_1] + distance[b][c_1];
+			number_num[6] = distance[a][b] + distance[a_1][c] + distance[b_1][c_1];
+			number_num[7] = distance[a][b_1] + distance[c][a_1] + distance[b][c_1];
 		} else if (j == N - 1) {
-			number_num[0] = distance[i][i + 1] + distance[j][0] + distance[k][k + 1];
-			number_num[1] = distance[i][j] + distance[i + 1][0] + distance[k][k + 1];
-			number_num[2] = distance[i][i + 1] + distance[j][k] + distance[0][k + 1];
-			number_num[3] = distance[i][k] + distance[j][0] + distance[k + 1][i + 1];
-			number_num[4] = distance[i][0] + distance[k][j] + distance[i + 1][k + 1];
-			number_num[5] = distance[i][k] + distance[i + 1][0] + distance[j][k + 1];
-			number_num[6] = distance[i][j] + distance[i + 1][k] + distance[0][k + 1];
-			number_num[7] = distance[i][0] + distance[k][i + 1] + distance[j][k + 1];
+			int a = bestAnt.tour[i][0];
+			int a_1 = bestAnt.tour[i + 1][0];
+			int b = bestAnt.tour[j][0];
+			int b_1 = bestAnt.tour[0][0];
+			int c = bestAnt.tour[k][0];
+			int c_1 = bestAnt.tour[k + 1][0];
+			number_num[0] = distance[a][a_1] + distance[b][b_1] + distance[c][c_1];
+			number_num[1] = distance[a][b] + distance[a_1][b_1] + distance[c][c_1];
+			number_num[2] = distance[a][a_1] + distance[b][c] + distance[b_1][c_1];
+			number_num[3] = distance[a][c] + distance[b][b_1] + distance[c_1][a_1];
+			number_num[4] = distance[a][b_1] + distance[c][b] + distance[a_1][c_1];
+			number_num[5] = distance[a][c] + distance[a_1][b_1] + distance[b][c_1];
+			number_num[6] = distance[a][b] + distance[a_1][c] + distance[b_1][c_1];
+			number_num[7] = distance[a][b_1] + distance[c][a_1] + distance[b][c_1];
 		} else if (k == N - 1) {
-			number_num[0] = distance[i][i + 1] + distance[j][j + 1] + distance[k][0];
-			number_num[1] = distance[i][j] + distance[i + 1][j + 1] + distance[k][0];
-			number_num[2] = distance[i][i + 1] + distance[j][k] + distance[j + 1][0];
-			number_num[3] = distance[i][k] + distance[j][j + 1] + distance[0][i + 1];
-			number_num[4] = distance[i][j + 1] + distance[k][j] + distance[i + 1][0];
-			number_num[5] = distance[i][k] + distance[i + 1][j + 1] + distance[j][0];
-			number_num[6] = distance[i][j] + distance[i + 1][k] + distance[j + 1][0];
-			number_num[7] = distance[i][j + 1] + distance[k][i + 1] + distance[j][0];
+			int a = bestAnt.tour[i][0];
+			int a_1 = bestAnt.tour[i + 1][0];
+			int b = bestAnt.tour[j][0];
+			int b_1 = bestAnt.tour[j + 1][0];
+			int c = bestAnt.tour[k][0];
+			int c_1 = bestAnt.tour[0][0];
+			number_num[0] = distance[a][a_1] + distance[b][b_1] + distance[c][c_1];
+			number_num[1] = distance[a][b] + distance[a_1][b_1] + distance[c][c_1];
+			number_num[2] = distance[a][a_1] + distance[b][c] + distance[b_1][c_1];
+			number_num[3] = distance[a][c] + distance[b][b_1] + distance[c_1][a_1];
+			number_num[4] = distance[a][b_1] + distance[c][b] + distance[a_1][c_1];
+			number_num[5] = distance[a][c] + distance[a_1][b_1] + distance[b][c_1];
+			number_num[6] = distance[a][b] + distance[a_1][c] + distance[b_1][c_1];
+			number_num[7] = distance[a][b_1] + distance[c][a_1] + distance[b][c_1];
 		}
 
 		for (int num = 0; num < 8; num++) {
@@ -466,6 +540,8 @@ public class ACO {
 			}
 		}
 
+		// number[1] = number_num[0] - number_num[(int)number[0]];
+		// bestAnt.totalLength = bestAnt.totalLength - number_num[0] + number_8;
 		return number;
 
 		// int a, b;
@@ -542,25 +618,82 @@ public class ACO {
 		if (j >= N) {
 			j = j - N;
 		}
-		
-		if(i>j) {
+
+		if (i > j) {
 			int temp = i;
 			i = j;
-			j= temp;
+			j = temp;
 		}
 
-		if ((i > 0) && (j <= N - 1)) {
-			for (int x = 0; x < (j - i + 1) / 2; x++) {
+		if ((i > 0) && (j <= N - 1) && (i < j)) {
+			if ((j - i) % 2 == 1) {
+				for (int x = 0; x < (j - i + 1) / 2; x++) {
 
-				int temp = Ant1.tour[j - x][0];
-				Ant1.tour[j - x][0] = Ant1.tour[i + x][0];
-				Ant1.tour[i + x][0] = temp;
+					int temp = Ant1.tour[j - x][0];
+					Ant1.tour[j - x][0] = Ant1.tour[i + x][0];
+					Ant1.tour[i + x][0] = temp;
 
-				temp = Ant1.tour[j - 1 - x][1];
-				Ant1.tour[j - 1 - x][1] = Ant1.tour[i - 1 + x][1];
-				Ant1.tour[i - 1 + x][1] = temp;
+					temp = Ant1.tour[j - 1 - x][1];
+					Ant1.tour[j - 1 - x][1] = Ant1.tour[i - 1 + x][1];
+					Ant1.tour[i - 1 + x][1] = temp;
+				}
+			} else {
+				for (int x = 0; x < (j - i) / 2; x++) {
+
+					int temp = Ant1.tour[j - x][0];
+					Ant1.tour[j - x][0] = Ant1.tour[i + x][0];
+					Ant1.tour[i + x][0] = temp;
+
+					temp = Ant1.tour[j - 1 - x][1];
+					Ant1.tour[j - 1 - x][1] = Ant1.tour[i - 1 + x][1];
+					Ant1.tour[i - 1 + x][1] = temp;
+				}
+
 			}
-		} 
+		}
+
+		else if ((i == 0) && (j <= N - 1)) {
+			if ((j - i) % 2 == 1) {
+				for (int x = 0; x < (j - i + 1) / 2; x++) {
+
+					int temp = Ant1.tour[j - x][0];
+					Ant1.tour[j - x][0] = Ant1.tour[i + x][0];
+					Ant1.tour[i + x][0] = temp;
+
+					if (x == 0) {
+						int temp_1 = Ant1.tour[j - 1][1];
+						Ant1.tour[j - 1][1] = Ant1.tour[N - 1][1];
+						Ant1.tour[N - 1][1] = temp_1;
+					} else {
+						temp = Ant1.tour[j - 1 - x][1];
+						Ant1.tour[j - 1 - x][1] = Ant1.tour[i - 1 + x][1];
+						Ant1.tour[i - 1 + x][1] = temp;
+					}
+				}
+			} else {
+				for (int x = 0; x < (j - i) / 2; x++) {
+
+					int temp = Ant1.tour[j - x][0];
+					Ant1.tour[j - x][0] = Ant1.tour[i + x][0];
+					Ant1.tour[i + x][0] = temp;
+
+					if (x == 0) {
+						int temp_1 = Ant1.tour[j - 1][1];
+						Ant1.tour[j - 1][1] = Ant1.tour[N - 1][1];
+						Ant1.tour[N - 1][1] = temp_1;
+					} else {
+						temp = Ant1.tour[j - 1 - x][1];
+						Ant1.tour[j - 1 - x][1] = Ant1.tour[i - 1 + x][1];
+						Ant1.tour[i - 1 + x][1] = temp;
+					}
+				}
+
+			}
+
+		}
+		// else if(i>j) {
+		//
+		// }
 
 		// if (i >= N) {
 		// i = i - N;

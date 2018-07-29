@@ -21,12 +21,12 @@ public class ACOmain {
 		int N = locate.length; // 城市数目
 		// int M=locate.length;
 		int M = (int)(N*0.666667); 
-		int L = 500;
+		int L = 2500;
 		double value;   // 信息素的初值设定
 		double beta = 5;
 		double alpha = 2;
-		double localRate = 0.05;
-		double globalRate = 0.05;
+		double localRate = 0.1;
+		double globalRate = 0.02;
 		double teta_value = 0;
 
 		aco.InitData(locate, N, M, L, beta, alpha, localRate, globalRate);
@@ -49,10 +49,10 @@ public class ACOmain {
 //				
 //			}
 
-			ant[i] = aco.OneIterator();
+			ant[i] = aco.OneIterator(i);
 			// System.out.println(i);
 			// 此处可以查看每次循环得到的最优解的情况
-			 System.out.println(ant[i].totalLength);
+//			 System.out.println(ant[i].totalLength);
 			System.out.println(aco.globalBestLength);
 			// System.out.println("第"+i+"最优路径为：");
 			// for(int j=0;j<locate.length;j++)

@@ -1,7 +1,8 @@
 package com.test_2;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
 
 public class Pattern_Display extends JPanel {
 	

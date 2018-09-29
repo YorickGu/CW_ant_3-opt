@@ -1,12 +1,10 @@
 package com.test_2;
 
 import static java.lang.Math.pow;
+import static java.lang.Math.random;
 import static java.lang.Math.sqrt;
 
-import java.text.DecimalFormat;
 import java.util.Random;
-
-import static java.lang.Math.random;
 
 public class ACO {
 
